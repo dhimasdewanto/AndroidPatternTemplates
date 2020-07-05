@@ -23,26 +23,17 @@ class MainViewModel(
 
     private suspend fun fetchData() {
         if (state is MainState.LoadingData) return
-
-        updateState {
-            MainState.LoadingData
-        }
+        state = MainState.LoadingData
 
         val listUsers = userRepo.getListUsers()
-        updateState {
-            MainState.ShowData(listUsers)
-        }
+        state = MainState.ShowData(listUsers)
     }
 
     private fun addCounter() {
-        updateState {
-            MainState.Clicked(counter++)
-        }
+        state = MainState.Clicked(counter++)
     }
 
     private fun removeCounter() {
-        updateState {
-            MainState.Clicked(counter--)
-        }
+        state = MainState.Clicked(counter--)
     }
 }

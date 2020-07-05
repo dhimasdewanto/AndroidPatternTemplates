@@ -7,20 +7,25 @@ import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
 
-abstract class ScopeViewModel<S: IState, I: IIntent>(
-    val intentChannel: Channel<I>,
-    private val initialState: S
+abstract class ScopeViewModel<State : IState, Intent : IIntent>(
+    val intentChannel: Channel<Intent>,
+    private val initialState: State
 ) : ViewModel() {
-    private val _viewModelState = MutableLiveData<S>().apply {
+    private val _viewModelState = MutableLiveData<State>().apply {
         value = initialState
     }
-    val viewModelState : LiveData<S>
+    val viewModelState: LiveData<State>
         get() = _viewModelState
 
-    val state: S
+    var state: State
         get() = viewModelState.value!!
+        set(value) {
+            viewModelScope.launch(Dispatchers.Main) {
+                _viewModelState.value = value
+            }
+        }
 
-    abstract val handleIntent: suspend (intent: I) -> Unit
+    abstract val handleIntent: suspend (intent: Intent) -> Unit
 
     init {
         initIntentHandler()
@@ -34,21 +39,9 @@ abstract class ScopeViewModel<S: IState, I: IIntent>(
         }
     }
 
-    private fun handleIntentWithIO(intent: I) {
+    private fun handleIntentWithIO(intent: Intent) {
         viewModelScope.launch(Dispatchers.IO) {
             handleIntent(intent)
         }
-    }
-
-    protected fun updateState(handler: suspend (state: S) -> S) {
-        viewModelScope.launch(Dispatchers.Main) {
-            _viewModelState.value = handler(viewModelState.value!!)
-        }
-    }
-
-    fun observe(owner: LifecycleOwner, observerMethod: (state: S) -> Unit) {
-        viewModelState.observe(owner, Observer {
-            observerMethod(it)
-        })
     }
 }

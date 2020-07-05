@@ -3,21 +3,17 @@ package com.dhimasdewanto.androidpatterntemplates.features.ui.mvi
 import android.content.Intent
 import android.os.Bundle
 import android.view.View
-import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
-import androidx.lifecycle.lifecycleScope
 import com.dhimasdewanto.androidpatterntemplates.R
-import com.dhimasdewanto.androidpatterntemplates.core.mvi.IView
+import com.dhimasdewanto.androidpatterntemplates.core.mvi.ScopeActivity
 import com.dhimasdewanto.androidpatterntemplates.features.ui.mvvm.MvvmActivity
 import kotlinx.android.synthetic.main.activity_main.*
-import kotlinx.coroutines.launch
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.closestKodein
 import org.kodein.di.generic.instance
 
-class MainActivity : AppCompatActivity(),
-    IView<MainState, MainIntent>, KodeinAware {
+class MainActivity : ScopeActivity<MainState, MainIntent>(), KodeinAware {
     override val kodein: Kodein by closestKodein()
     private val viewModelFactory by instance<MainViewModelFactory>()
 
@@ -26,18 +22,17 @@ class MainActivity : AppCompatActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
         viewModel = ViewModelProvider(this, viewModelFactory).get(MainViewModel::class.java)
+        setViewModelState(viewModel.viewModelState)
+        setIntentChannel(viewModel.intentChannel)
 
         "MVI".setAppBarTitle()
-
-        viewModel.observe(this) {
-            render(it)
-        }
 
         setOnClickButtons()
     }
 
-    override fun render(state: MainState) {
+    override fun handleState(state: MainState) {
         text_main.visibility = View.GONE
         loading_circular.visibility = View.GONE
 
@@ -57,12 +52,6 @@ class MainActivity : AppCompatActivity(),
                 text_main.text = state.listUsers[0].name
                 text_main.visibility = View.VISIBLE
             }
-        }
-    }
-
-    override fun sendIntent(intent: MainIntent) {
-        lifecycleScope.launch {
-            viewModel.intentChannel.send(intent)
         }
     }
 
