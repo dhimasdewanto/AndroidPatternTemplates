@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">Android Pattern Templates</string>
+    <string name="state_initial">Initial</string>
+    <string name="fetch">Fetch</string>
+    <string name="to_mvvm">To MVVM</string>
+    <string name="to_mvi">To MVI</string>
+</resources>
