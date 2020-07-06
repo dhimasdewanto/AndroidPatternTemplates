@@ -7,19 +7,17 @@ import kotlinx.coroutines.channels.Channel
 class MainViewModel(
     private val userRepo: UserRepo
 ) : ScopeViewModel<MainState, MainIntent>(
-    intentChannel = Channel(Channel.UNLIMITED),
     initialState = MainState.Initial
 ) {
     private var counter = 0
 
-    override val handleIntent: suspend (intent: MainIntent) -> Unit
-        get() = {
-            when(it) {
-                MainIntent.Add -> addCounter()
-                MainIntent.Remove -> removeCounter()
-                MainIntent.FetchData -> fetchData()
-            }
+    override suspend fun handleIntent(intent: MainIntent) {
+        when(intent) {
+            MainIntent.Add -> addCounter()
+            MainIntent.Remove -> removeCounter()
+            MainIntent.FetchData -> fetchData()
         }
+    }
 
     private suspend fun fetchData() {
         if (state is MainState.LoadingData) return

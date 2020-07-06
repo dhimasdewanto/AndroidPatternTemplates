@@ -8,8 +8,8 @@ import kotlinx.coroutines.flow.consumeAsFlow
 import kotlinx.coroutines.launch
 
 abstract class ScopeViewModel<State : IState, Intent : IIntent>(
-    val intentChannel: Channel<Intent>,
-    private val initialState: State
+    private val initialState: State,
+    val intentChannel: Channel<Intent> = Channel(Channel.UNLIMITED)
 ) : ViewModel() {
     private val _viewModelState = MutableLiveData<State>().apply {
         value = initialState
@@ -25,11 +25,11 @@ abstract class ScopeViewModel<State : IState, Intent : IIntent>(
             }
         }
 
-    abstract val handleIntent: suspend (intent: Intent) -> Unit
-
     init {
         initIntentHandler()
     }
+
+    abstract suspend fun handleIntent(intent: Intent)
 
     private fun initIntentHandler() {
         viewModelScope.launch {
