@@ -10,14 +10,12 @@ class MvvmViewModel(
 ) {
     private var counter = 0
 
-    fun fetchData() {
-        if (state is MvvmState.LoadingData) return
+    fun fetchData() = launchWithIO {
+        if (state is MvvmState.LoadingData) return@launchWithIO
         state = MvvmState.LoadingData
 
-        launchWithIO {
-            val listUsers = userRepo.getListUsers()
-            state = MvvmState.ShowData(listUsers)
-        }
+        val listUsers = userRepo.getListUsers()
+        state = MvvmState.ShowData(listUsers)
     }
 
     fun addCounter() {
