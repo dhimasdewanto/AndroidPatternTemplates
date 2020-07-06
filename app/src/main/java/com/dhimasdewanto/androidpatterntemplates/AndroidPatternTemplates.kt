@@ -3,6 +3,7 @@ package com.dhimasdewanto.androidpatterntemplates
 import android.app.Application
 import com.dhimasdewanto.androidpatterntemplates.features.logic.repositories.UserRepo
 import com.dhimasdewanto.androidpatterntemplates.features.logic.services.JsonPlaceholderService
+import com.dhimasdewanto.androidpatterntemplates.features.logic.use_cases.GetListUsers
 import com.dhimasdewanto.androidpatterntemplates.features.ui.mvi.MainViewModelFactory
 import com.dhimasdewanto.androidpatterntemplates.features.ui.mvvm.MvvmViewModelFactory
 import org.kodein.di.Kodein
@@ -20,6 +21,7 @@ class AndroidPatternTemplates : Application(), KodeinAware {
 
         bind() from singleton { JsonPlaceholderService() }
         bind() from singleton { UserRepo(instance()) }
+        bind() from singleton { GetListUsers(instance()) }
         bind() from provider { MainViewModelFactory(instance()) }
         bind() from provider { MvvmViewModelFactory(instance()) }
     }

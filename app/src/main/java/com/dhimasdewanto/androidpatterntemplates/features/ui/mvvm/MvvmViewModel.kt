@@ -4,10 +4,11 @@ import com.dhimasdewanto.androidpatterntemplates.core.error_handler.Err
 import com.dhimasdewanto.androidpatterntemplates.core.error_handler.Ok
 import com.dhimasdewanto.androidpatterntemplates.core.mvvm.ScopeViewModel
 import com.dhimasdewanto.androidpatterntemplates.features.logic.failures.Failures
-import com.dhimasdewanto.androidpatterntemplates.features.logic.repositories.UserRepo
+import com.dhimasdewanto.androidpatterntemplates.features.logic.use_cases.GetListUsers
+import com.dhimasdewanto.androidpatterntemplates.features.logic.use_cases.GetListUsersParams
 
 class MvvmViewModel(
-    private val userRepo: UserRepo
+    private val getListUsers: GetListUsers
 ) : ScopeViewModel<MvvmState>(
     MvvmState.Initial
 ) {
@@ -17,11 +18,13 @@ class MvvmViewModel(
         if (state is MvvmState.LoadingData) return@launchWithIO
         state = MvvmState.LoadingData
 
-        val resUsers = userRepo.getListUsers()
-        state = when(resUsers) {
+        val resUsers = getListUsers.call(
+            GetListUsersParams(10)
+        )
+        state = when (resUsers) {
             is Ok -> MvvmState.ShowData(resUsers.value)
             is Err -> {
-                when(resUsers.failure) {
+                when (resUsers.failure) {
                     Failures.SomeFailure -> MvvmState.ShowError("Some Failure")
                     Failures.ExampleFailure -> MvvmState.ShowError("Example Failure")
                 }
