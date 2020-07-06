@@ -15,4 +15,8 @@ sealed class MainState : IState {
     data class ShowData(
         val listUsers: List<UserModel>
     ) : MainState()
+
+    data class ShowError(
+        val message: String
+    ) : MainState()
 }

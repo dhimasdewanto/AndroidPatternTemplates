@@ -14,4 +14,8 @@ sealed class MvvmState {
     data class ShowData(
         val listUsers: List<UserModel>
     ) : MvvmState()
+
+    data class ShowError(
+        val message: String
+    ) : MvvmState()
 }

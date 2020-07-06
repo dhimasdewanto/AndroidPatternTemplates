@@ -58,6 +58,10 @@ class MvvmActivity : ScopeActivity<MvvmState>(), KodeinAware {
                 text_main.text = state.listUsers[0].email
                 text_main.visibility = View.VISIBLE
             }
+            is MvvmState.ShowError -> {
+                text_main.text = state.message
+                text_main.visibility = View.VISIBLE
+            }
         }
     }
 

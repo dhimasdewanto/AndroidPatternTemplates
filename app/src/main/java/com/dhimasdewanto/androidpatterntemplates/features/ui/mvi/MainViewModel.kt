@@ -1,8 +1,10 @@
 package com.dhimasdewanto.androidpatterntemplates.features.ui.mvi
 
+import com.dhimasdewanto.androidpatterntemplates.core.error_handler.Err
+import com.dhimasdewanto.androidpatterntemplates.core.error_handler.Ok
 import com.dhimasdewanto.androidpatterntemplates.core.mvi.ScopeViewModel
+import com.dhimasdewanto.androidpatterntemplates.features.logic.failures.Failures
 import com.dhimasdewanto.androidpatterntemplates.features.logic.repositories.UserRepo
-import kotlinx.coroutines.channels.Channel
 
 class MainViewModel(
     private val userRepo: UserRepo
@@ -23,8 +25,16 @@ class MainViewModel(
         if (state is MainState.LoadingData) return
         state = MainState.LoadingData
 
-        val listUsers = userRepo.getListUsers()
-        state = MainState.ShowData(listUsers)
+        val resUsers = userRepo.getListUsers()
+        state = when(resUsers) {
+            is Ok -> MainState.ShowData(resUsers.value)
+            is Err -> {
+                when(resUsers.failure) {
+                    Failures.SomeFailure -> MainState.ShowError("Some Failure")
+                    Failures.ExampleFailure -> MainState.ShowError("Example Failure")
+                }
+            }
+        }
     }
 
     private fun addCounter() {

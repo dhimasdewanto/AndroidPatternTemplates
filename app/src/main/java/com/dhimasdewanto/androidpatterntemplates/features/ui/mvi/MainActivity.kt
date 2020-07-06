@@ -52,6 +52,10 @@ class MainActivity : ScopeActivity<MainState, MainIntent>(), KodeinAware {
                 text_main.text = state.listUsers[0].name
                 text_main.visibility = View.VISIBLE
             }
+            is MainState.ShowError -> {
+                text_main.text = state.message
+                text_main.visibility = View.VISIBLE
+            }
         }
     }
 
