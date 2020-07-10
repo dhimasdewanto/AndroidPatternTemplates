@@ -5,6 +5,7 @@ import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.Toast
+import androidx.activity.addCallback
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
@@ -28,6 +29,8 @@ class CameraXFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProvider(this).get(CameraXViewModel::class.java)
+        hideSystemUI()
+        onBackShowSystemUI()
 
         cameraXBuilder = CameraXBuilder(fragment, view_finder)
         button_camera_capture.setOnClickListener {
@@ -43,6 +46,21 @@ class CameraXFragment : Fragment() {
         grantResults: IntArray
     ) {
         cameraXBuilder.setPermission(requestCode) {
+            findNavController().popBackStack()
+        }
+    }
+
+    private fun hideSystemUI() {
+        requireActivity()
+            .window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_FULLSCREEN
+        (requireActivity() as MainActivity).supportActionBar!!.hide()
+    }
+
+    private fun onBackShowSystemUI() {
+        requireActivity().onBackPressedDispatcher.addCallback(viewLifecycleOwner) {
+            requireActivity()
+                .window.decorView.systemUiVisibility = View.SYSTEM_UI_FLAG_VISIBLE
+            (requireActivity() as MainActivity).supportActionBar!!.show()
             findNavController().popBackStack()
         }
     }
