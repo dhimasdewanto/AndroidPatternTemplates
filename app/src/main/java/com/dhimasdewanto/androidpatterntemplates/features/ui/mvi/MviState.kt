@@ -3,20 +3,20 @@ package com.dhimasdewanto.androidpatterntemplates.features.ui.mvi
 import com.dhimasdewanto.androidpatterntemplates.core.mvi.IState
 import com.dhimasdewanto.androidpatterntemplates.features.logic.models.UserModel
 
-sealed class MainState : IState {
-    object Initial : MainState()
+sealed class MviState : IState {
+    object Initial : MviState()
 
-    object LoadingData : MainState()
+    object LoadingData : MviState()
 
     data class Clicked(
         val count: Int
-    ) : MainState()
+    ) : MviState()
 
     data class ShowData(
         val listUsers: List<UserModel>
-    ) : MainState()
+    ) : MviState()
 
     data class ShowError(
         val message: String
-    ) : MainState()
+    ) : MviState()
 }

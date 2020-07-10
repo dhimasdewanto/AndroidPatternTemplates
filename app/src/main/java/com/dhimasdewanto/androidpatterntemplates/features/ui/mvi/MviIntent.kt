@@ -2,10 +2,10 @@ package com.dhimasdewanto.androidpatterntemplates.features.ui.mvi
 
 import com.dhimasdewanto.androidpatterntemplates.core.mvi.IIntent
 
-sealed class MainIntent : IIntent {
-    object Add : MainIntent()
+sealed class MviIntent : IIntent {
+    object Add : MviIntent()
 
-    object Remove : MainIntent()
+    object Remove : MviIntent()
 
-    object FetchData : MainIntent()
+    object FetchData : MviIntent()
 }
