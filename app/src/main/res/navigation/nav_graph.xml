@@ -17,10 +17,22 @@
             app:exitAnim="@anim/nav_default_exit_anim"
             app:popEnterAnim="@anim/nav_default_pop_enter_anim"
             app:popExitAnim="@anim/nav_default_pop_exit_anim" />
+        <action
+            android:id="@+id/action_mviFragment_to_cameraXFragment"
+            app:destination="@id/cameraXFragment"
+            app:enterAnim="@anim/nav_default_enter_anim"
+            app:exitAnim="@anim/nav_default_exit_anim"
+            app:popEnterAnim="@anim/nav_default_pop_enter_anim"
+            app:popExitAnim="@anim/nav_default_pop_exit_anim" />
     </fragment>
     <fragment
         android:id="@+id/mvvmFragment"
         android:name="com.dhimasdewanto.androidpatterntemplates.features.ui.mvvm.MvvmFragment"
         android:label="fragment_mvvm"
         tools:layout="@layout/fragment_mvvm" />
+    <fragment
+        android:id="@+id/cameraXFragment"
+        android:name="com.dhimasdewanto.androidpatterntemplates.features.ui.camerax.CameraXFragment"
+        android:label="fragment_camera_x"
+        tools:layout="@layout/fragment_camera_x" />
 </navigation>

@@ -82,6 +82,10 @@ class MviFragment : ScopeFragment<MviState, MviIntent>(), KodeinAware {
         button_to_mvvm.setOnClickListener {
             findNavController().navigate(R.id.action_mviFragment_to_mvvmFragment)
         }
+
+        button_to_camerax.setOnClickListener {
+            findNavController().navigate(R.id.action_mviFragment_to_cameraXFragment)
+        }
     }
 
     private fun String.setAppBarTitle() {
