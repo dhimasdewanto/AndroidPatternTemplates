@@ -4,10 +4,13 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import com.dhimasdewanto.androidpatterntemplates.R
+import com.dhimasdewanto.androidpatterntemplates.core.camera_x.CameraXBuilder
+import com.dhimasdewanto.androidpatterntemplates.features.ui.MainActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.android.synthetic.main.fragment_camera_x.*
 
@@ -26,10 +29,12 @@ class CameraXFragment : Fragment() {
         super.onActivityCreated(savedInstanceState)
         viewModel = ViewModelProvider(this).get(CameraXViewModel::class.java)
 
-        cameraXBuilder = CameraXBuilder(view_finder)
-        cameraXBuilder.initCameraX(fragment)
-
-        camera_capture_button.setOnClickListener { cameraXBuilder.takePhoto(fragment) }
+        cameraXBuilder = CameraXBuilder(fragment, view_finder)
+        button_camera_capture.setOnClickListener {
+            cameraXBuilder.takePhoto {
+                Toast.makeText(context, "Success take photo!", Toast.LENGTH_SHORT).show()
+            }
+        }
     }
 
     override fun onRequestPermissionsResult(
@@ -37,7 +42,7 @@ class CameraXFragment : Fragment() {
         permissions: Array<out String>,
         grantResults: IntArray
     ) {
-        cameraXBuilder.setPermission(fragment, requestCode) {
+        cameraXBuilder.setPermission(requestCode) {
             findNavController().popBackStack()
         }
     }

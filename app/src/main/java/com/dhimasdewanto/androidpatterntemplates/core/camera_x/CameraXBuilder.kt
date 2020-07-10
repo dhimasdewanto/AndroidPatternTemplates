@@ -1,4 +1,4 @@
-package com.dhimasdewanto.androidpatterntemplates.features.ui.camerax
+package com.dhimasdewanto.androidpatterntemplates.core.camera_x
 
 import android.Manifest
 import android.content.Context
@@ -6,20 +6,22 @@ import android.content.pm.PackageManager
 import android.icu.text.SimpleDateFormat
 import android.net.Uri
 import android.util.Log
-import android.widget.Toast
 import androidx.camera.core.*
 import androidx.camera.lifecycle.ProcessCameraProvider
 import androidx.camera.view.PreviewView
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
-import com.dhimasdewanto.androidpatterntemplates.R
 import java.io.File
 import java.util.*
 
 class CameraXBuilder(
+    private val fragment: Fragment,
     private val cameraViewFinder: PreviewView,
     private val captureMode: Int = ImageCapture.CAPTURE_MODE_MINIMIZE_LATENCY,
-    private val lensFacing: Int = CameraSelector.LENS_FACING_BACK
+    private val lensFacing: Int = CameraSelector.LENS_FACING_BACK,
+    private val isBokehEnabled: Boolean = false,
+    private val isHdrEnabled: Boolean = false,
+    private val configDirectory: File = CameraXDirectory(fragment).outputDirectory
 ) {
 
     companion object {
@@ -34,8 +36,11 @@ class CameraXBuilder(
     private lateinit var camera: Camera
     private lateinit var outputDirectory: File
 
+    init {
+        initCameraX()
+    }
+
     fun takePhoto(
-        fragment: Fragment,
         fileName: String = SimpleDateFormat(FILENAME_FORMAT, Locale.US)
             .format(System.currentTimeMillis()) + ".jpg",
         onImageSavedResponse: (output: ImageCapture.OutputFileResults) -> Unit = fun(_) {}
@@ -65,23 +70,7 @@ class CameraXBuilder(
             })
     }
 
-    fun initCameraX(fragment: Fragment) {
-        val baseContext = fragment.requireActivity().baseContext
-        if (allPermissionsGranted(baseContext)) {
-            startCamera(fragment)
-            return
-        }
-
-        fragment.requestPermissions(
-            REQUIRED_PERMISSIONS,
-            REQUEST_CODE_PERMISSIONS
-        )
-
-        outputDirectory = getOutputDirectory(fragment)
-    }
-
     fun setPermission(
-        fragment: Fragment,
         requestCode: Int,
         onNotGranted: () -> Unit
     ) {
@@ -94,7 +83,21 @@ class CameraXBuilder(
             onNotGranted()
         }
 
-        startCamera(fragment)
+        startCamera()
+    }
+
+    private fun initCameraX() {
+        val baseContext = fragment.requireActivity().baseContext
+        if (allPermissionsGranted(baseContext)) {
+            outputDirectory = configDirectory
+            startCamera()
+            return
+        }
+
+        fragment.requestPermissions(
+            REQUIRED_PERMISSIONS,
+            REQUEST_CODE_PERMISSIONS
+        )
     }
 
     private fun allPermissionsGranted(baseContext: Context) = REQUIRED_PERMISSIONS.all {
@@ -103,7 +106,7 @@ class CameraXBuilder(
         ) == PackageManager.PERMISSION_GRANTED
     }
 
-    private fun startCamera(fragment: Fragment) {
+    private fun startCamera() {
         val cameraProviderFuture =
             ProcessCameraProvider.getInstance(fragment.requireContext())
 
@@ -114,16 +117,21 @@ class CameraXBuilder(
             // Init Preview
             preview = Preview.Builder().build()
 
-            // Init Image Capture
-            imageCapture = ImageCapture.Builder()
+            // Init Image
+            val imageCaptureBuilder = ImageCapture.Builder()
+            imageCapture = imageCaptureBuilder
                 .setCaptureMode(captureMode)
                 .build()
 
             // Select back camera
-            val cameraSelector =
-                CameraSelector.Builder()
-                    .requireLensFacing(lensFacing)
-                    .build()
+            val cameraSelector = CameraSelector.Builder()
+                .requireLensFacing(lensFacing)
+                .build()
+
+            // Set CameraX Extension
+            val extension = CameraXExtension(imageCaptureBuilder, cameraSelector)
+            extension.tryEnableBokeh(isBokehEnabled)
+            extension.tryEnableHdr(isHdrEnabled)
 
             try {
                 // Unbind use cases before rebinding
@@ -139,20 +147,6 @@ class CameraXBuilder(
             }
 
         }, ContextCompat.getMainExecutor(fragment.activity))
-    }
-
-    private fun getOutputDirectory(fragment: Fragment): File {
-        val filesDir = fragment.requireActivity().filesDir
-
-        val mediaDir = fragment.activity?.externalMediaDirs?.firstOrNull()?.let {
-            File(it, fragment.resources.getString(R.string.app_name)).apply { mkdirs() }
-        }
-
-        if (mediaDir != null && mediaDir.exists()) {
-            return mediaDir
-        }
-
-        return filesDir
     }
 
 }
