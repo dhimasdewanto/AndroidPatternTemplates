@@ -8,8 +8,11 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.dhimasdewanto.androidpatterntemplates.R
+import com.dhimasdewanto.androidpatterntemplates.core.recycler_adapter.SimpleRecyclerAdapter
 import com.dhimasdewanto.androidpatterntemplates.core.mvi.ScopeFragment
+import com.dhimasdewanto.androidpatterntemplates.features.logic.models.UserModel
 import kotlinx.android.synthetic.main.fragment_mvi.*
+import kotlinx.android.synthetic.main.item_user.view.*
 import org.kodein.di.Kodein
 import org.kodein.di.KodeinAware
 import org.kodein.di.android.x.closestKodein
@@ -20,7 +23,7 @@ class MviFragment : ScopeFragment<MviState, MviIntent>(), KodeinAware {
     private val viewModelFactory by instance<MviViewModelFactory>()
 
     private lateinit var viewModel: MviViewModel
-    private lateinit var recyclerAdapter: MviListAdapter
+    private lateinit var recyclerAdapter: SimpleRecyclerAdapter<UserModel>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -93,7 +96,16 @@ class MviFragment : ScopeFragment<MviState, MviIntent>(), KodeinAware {
     }
 
     private fun initRecyclerView() {
-        recyclerAdapter = MviListAdapter()
+        recyclerAdapter = SimpleRecyclerAdapter(
+            layoutItem = R.layout.item_user,
+            areItemsTheSame = { oldItem, newItem -> oldItem.id == newItem.id },
+            areContentsTheSame = { oldItem, newItem -> oldItem == newItem },
+            bindItem = { item, itemView ->
+                itemView.text_name.text = item.name
+                itemView.text_email.text = item.email
+            }
+        )
+
         recycler_view_users.apply {
             layoutManager = LinearLayoutManager(context)
             adapter = recyclerAdapter
