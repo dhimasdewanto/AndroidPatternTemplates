@@ -6,6 +6,7 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.lifecycle.ViewModelProvider
 import androidx.navigation.fragment.findNavController
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.dhimasdewanto.androidpatterntemplates.R
 import com.dhimasdewanto.androidpatterntemplates.core.mvi.ScopeFragment
 import kotlinx.android.synthetic.main.fragment_mvi.*
@@ -19,6 +20,7 @@ class MviFragment : ScopeFragment<MviState, MviIntent>(), KodeinAware {
     private val viewModelFactory by instance<MviViewModelFactory>()
 
     private lateinit var viewModel: MviViewModel
+    private lateinit var recyclerAdapter: MviListAdapter
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -35,6 +37,7 @@ class MviFragment : ScopeFragment<MviState, MviIntent>(), KodeinAware {
         setIntentChannel(viewModel.intentChannel)
 
         "MVI".setAppBarTitle()
+        initRecyclerView()
 
         setOnClickButtons()
     }
@@ -42,6 +45,7 @@ class MviFragment : ScopeFragment<MviState, MviIntent>(), KodeinAware {
     override fun handleState(state: MviState) {
         text_main.visibility = View.INVISIBLE
         loading_circular.visibility = View.INVISIBLE
+        recycler_view_users.visibility = View.INVISIBLE
 
         when (state) {
             is MviState.Initial -> {
@@ -56,8 +60,8 @@ class MviFragment : ScopeFragment<MviState, MviIntent>(), KodeinAware {
                 loading_circular.visibility = View.VISIBLE
             }
             is MviState.ShowData -> {
-                text_main.text = state.listUsers[0].name
-                text_main.visibility = View.VISIBLE
+                recyclerAdapter.submitList(state.listUsers)
+                recycler_view_users.visibility = View.VISIBLE
             }
             is MviState.ShowError -> {
                 text_main.text = state.message
@@ -85,6 +89,14 @@ class MviFragment : ScopeFragment<MviState, MviIntent>(), KodeinAware {
 
         button_to_camerax.setOnClickListener {
             findNavController().navigate(R.id.action_mviFragment_to_cameraXFragment)
+        }
+    }
+
+    private fun initRecyclerView() {
+        recyclerAdapter = MviListAdapter()
+        recycler_view_users.apply {
+            layoutManager = LinearLayoutManager(context)
+            adapter = recyclerAdapter
         }
     }
 
