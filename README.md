@@ -1,4 +1,4 @@
-# Android Pattern Templates
+ # Android Pattern Templates
 
 Collection of best practice android patterns.
 
